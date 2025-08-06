@@ -1,0 +1,79 @@
+name: slack-webhook
+endpoint: https://hooks.slack.com/services/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
+allowInsecureSSL: false
+$schema: https://schemas.humio.com/action/v0.6.0
+method: POST
+body: |-
+  {
+    "channel": "https://schibsted-media.slack.com/archives/C092U2MRX34",
+    "attachments": [
+      {
+        "color": "#FF0000",
+        "blocks": [
+          {
+            "type": "header",
+            "text": {
+              "type": "plain_text",
+              "text": "🚨 {alert_name}"
+            }
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "*Description:*\n>{alert_description}"
+            }
+          },
+          {
+            "type": "divider"
+          },
+          {
+            "type": "section",
+            "fields": [
+              {
+                "type": "mrkdwn",
+                "text": "*Repository:*\n`{repo_name}`"
+              }
+            ]
+          },
+          {
+            "type": "section",
+            "text": {
+              "type": "mrkdwn",
+              "text": "*Filtered Messages:*\n```{query_result_summary}```"
+            }
+          },
+          {
+            "type": "context",
+            "elements": [
+              {
+                "type": "mrkdwn",
+                "text": "Triggered at: `{triggered_timestamp}` | Action ID: `{action_id}`"
+              }
+            ]
+          },
+          {
+            "type": "actions",
+            "elements": [
+              {
+                "type": "button",
+                "text": {
+                  "type": "plain_text",
+                  "text": "View in Humio"
+                },
+                "url": "{url}",
+                "style": "primary",
+                "action_id": "view_in_humio"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+headers:
+- header: Content-Type
+  value: application/json
+- header: Authorization
+  value: Ep2W2ychwufjc8RoicCb0jhd
+type: webhook

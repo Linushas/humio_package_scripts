@@ -1,0 +1,25 @@
+name: {mule-app-name}-WARN-Alert
+throttleTimeSeconds: 1200
+description: Detected {_warn_threshold} or more WARN log-events from {mule-app-name} within the
+  last 30 minutes.
+enabled: true
+queryString: |-
+  app = {mule-app-name}
+  loglevel = WARN
+  | [count(), tail(10)]
+  | _count > {_warn_threshold}
+  | regex("Message\s*:\s*(?<msg1>[^\n]*)", field=messageInfo, strict=false)
+  | regex("^.*\]\s+[\w\.]+:\s+(?<msg2>.*)", field=messageInfo, strict=false)
+  | regex("Error Description:\s*'(?<msg3>.*?)'\.", field=messageInfo, strict=false)
+  | regex("An unhandled error occurred:\s*(?<msg4>.*)", field=messageInfo, strict=false)
+  | filtered_message := coalesce(msg1, msg2, msg3, msg4, messageInfo)
+  | drop(msg1, msg2, msg3, msg4)
+  | groupBy(filtered_message)
+  | table([_count, filtered_message])
+queryTimestampType: ingest-timestamp
+triggerMode: complete-mode
+searchIntervalSeconds: 1800
+$schema: https://schemas.humio.com/aggregatealert/v0.1.0
+labels: []
+actionNameReferences:
+- slack-webhook

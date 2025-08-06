@@ -1,0 +1,383 @@
+sections:
+  section-1750935959249-0:
+    collapsed: true
+    timeSelector:
+      end: now
+      start: 1d
+    widgetIds:
+    - 84126bdd-5564-4851-a3aa-c73dd77cb1cf
+    - 1d0a8633-2c01-4106-a042-246e6cf928c6
+    - e3aa9779-9f2e-488c-b1ca-0aab006ccc23
+    order: 2
+    title: Vector
+  section-1751449799157-1:
+    collapsed: false
+    timeSelector:
+      end: now
+      start: 1d
+    widgetIds:
+    - a3561dbc-9525-453d-9b6b-b8a62233ac53
+    - 69c25367-0fb2-458c-8cc4-c8ca80878c80
+    - b286c958-98dd-4a20-a946-218ac2a2cae8
+    - 6b4d742a-c32d-4ccb-8155-7d164320b390
+    - 961bb309-8951-4fff-9fbc-0ca0a3dddeb7
+    order: 0
+    title: Details {mule-app-name}
+  section-1751449975900-2:
+    collapsed: false
+    timeSelector:
+      end: now
+      start: 1d
+    widgetIds:
+    - 00875f41-ff82-4eed-b193-f7b149d26c1c
+    - e5fcdb5e-5af2-40bd-b10e-9ddb334fccb7
+    - e88591de-9088-4741-9e73-869de88ccfb3
+    - b8b7995d-b14c-4fef-bea7-718dfb2977e2
+    order: 1
+    title: Alerting for {mule-app-name}
+name: {mule-app-name}
+timeSelector: {}
+sharedTimeInterval:
+  enabled: false
+  isLive: false
+  start: 1d
+widgets:
+  b8b7995d-b14c-4fef-bea7-718dfb2977e2:
+    x: 6
+    y: 5
+    height: 5
+    queryString: |-
+      app = {mule-app-name}
+      loglevel = ERROR
+      | regex("Message\s*:\s*(?<msg1>[^\n]*)", field=messageInfo, strict=false)
+      | regex("^.*\]\s+[\w\.]+:\s+(?<msg2>.*)", field=messageInfo, strict=false)
+      | regex("Error Description:\s*'(?<msg3>.*?)'\.", field=messageInfo, strict=false)
+      | regex("An unhandled error occurred:\s*(?<msg4>.*)", field=messageInfo, strict=false)
+      | filtered_message := coalesce(msg1, msg2, msg3, msg4, messageInfo)
+      | drop(msg1, msg2, msg3, msg4)
+      | timeChart(function=groupBy(filtered_message), series=filtered_message, span=5m)
+    end: now
+    start: 1d
+    width: 6
+    options:
+      connect-points: false
+      stacking: none
+      yAxisScale: linear
+      regression: false
+      imputation: none
+      gradient: false
+      plY: 50
+      horizontalPlotLineLabel: trigger
+      showDataPoints: false
+    visualization: time-chart
+    title: {mule-app-name} - Unique WARN logs
+    isLive: false
+    type: query
+  b286c958-98dd-4a20-a946-218ac2a2cae8:
+    x: 0
+    y: 5
+    height: 7
+    queryString: |-
+      app = {mule-app-name}
+      | groupBy(loglevel)
+    end: now
+    start: 6h
+    width: 5
+    options:
+      series: {}
+      trellisMaxColumns: 1
+      legendLabelOverflow: truncate
+      legend: true
+      enableTrellis: false
+      trellisField: ''
+      innerRadius: 0
+      legendPosition: right
+      legendTitle: ''
+      trellisShowBorders: true
+      valueFormat: abbreviated
+      maxSeriesCount: 50
+      withLegendTitle: true
+    visualization: pie-chart
+    title: Messages count
+    isLive: false
+    type: query
+  e88591de-9088-4741-9e73-869de88ccfb3:
+    x: 0
+    y: 5
+    height: 5
+    queryString: |+
+      app = {mule-app-name}
+      loglevel = ERROR
+      | regex("Message\s*:\s*(?<msg1>[^\n]*)", field=messageInfo, strict=false)
+      | regex("^.*\]\s+[\w\.]+:\s+(?<msg2>.*)", field=messageInfo, strict=false)
+      | regex("Error Description:\s*'(?<msg3>.*?)'\.", field=messageInfo, strict=false)
+      | regex("An unhandled error occurred:\s*(?<msg4>.*)", field=messageInfo, strict=false)
+      | filtered_message := coalesce(msg1, msg2, msg3, msg4, messageInfo)
+      | drop(msg1, msg2, msg3, msg4)
+      | timeChart(function=groupBy(filtered_message), series=filtered_message, span=5m)
+
+    end: now
+    start: 1d
+    width: 6
+    options:
+      plY: 12
+      horizontalPlotLineLabel: trigger
+      connect-points: false
+      stacking: none
+      yAxisScale: linear
+      imputation: none
+    visualization: time-chart
+    title: {mule-app-name} - Unique ERROR logs
+    isLive: false
+    type: query
+  961bb309-8951-4fff-9fbc-0ca0a3dddeb7:
+    x: 0
+    y: 0
+    height: 5
+    queryString: |-
+      loglevel = WARN or loglevel = ERROR
+      | app = {mule-app-name}
+      | timeChart(span=5m, function=count(), series=app)
+    end: now
+    start: 1d
+    width: 6
+    options:
+      gradient: false
+      valueFormat: abbreviated
+      interpolation: linear
+      lastBucketBehavior: include
+      xAxisTitle: ''
+      legendLabelOverflow: truncate
+      legend: true
+      showDataPoints: false
+      connect-points: false
+      plotType: area
+      imputation: none
+      yAxisTitle: count
+      stacking: none
+      polyOrder: 1
+      yAxisScale: linear
+      maxSeriesCount: 50
+      withLegendTitle: false
+      regression: false
+      regressionType: linear
+    visualization: time-chart
+    title: ERROR/WARN messages
+    isLive: false
+    type: query
+  a3561dbc-9525-453d-9b6b-b8a62233ac53:
+    x: 5
+    y: 5
+    height: 7
+    queryString: |-
+      app = {mule-app-name}
+      | sankey(source=flow, target=loglevel)
+    end: now
+    start: 6h
+    width: 7
+    options:
+      labelLimit: 208
+      labelPosition: inside
+      stackSortOrder: descending
+      stackSortType: grpId
+    visualization: sankey
+    title: Flow Sankey
+    isLive: false
+    type: query
+  84126bdd-5564-4851-a3aa-c73dd77cb1cf:
+    x: 0
+    y: 1
+    height: 4
+    queryString: |-
+      file = "*{mule-app-name}.log"
+      | timeChart(span=1m, function=count(), series=file)
+    end: now
+    start: 6h
+    width: 12
+    options:
+      gradient: false
+      valueFormat: abbreviated
+      interpolation: linear
+      lastBucketBehavior: include
+      xAxisTitle: ''
+      legendLabelOverflow: truncate
+      legend: true
+      showDataPoints: false
+      connect-points: false
+      plotType: area
+      imputation: none
+      yAxisTitle: count
+      stacking: none
+      polyOrder: 1
+      yAxisScale: linear
+      maxSeriesCount: 50
+      withLegendTitle: false
+      regression: false
+      regressionType: linear
+    visualization: time-chart
+    title: file-time-chart-1h
+    isLive: false
+    type: query
+  e5fcdb5e-5af2-40bd-b10e-9ddb334fccb7:
+    x: 6
+    y: 0
+    height: 5
+    queryString: |+
+      app = {mule-app-name}
+      loglevel = WARN
+      | timeChart(function=count(), series=loglevel, span=5m)
+
+    end: now
+    start: 1d
+    width: 6
+    options:
+      series: {}
+      connect-points: false
+      stacking: none
+      yAxisScale: linear
+      regression: false
+      imputation: none
+      gradient: false
+      plY: {_warn_threshold}
+      horizontalPlotLineLabel: trigger
+      showDataPoints: false
+    visualization: time-chart
+    title: {mule-app-name} - WARN logs
+    isLive: false
+    type: query
+  6b4d742a-c32d-4ccb-8155-7d164320b390:
+    x: 6
+    y: 0
+    height: 5
+    queryString: |-
+      app = {mule-app-name}
+      | timeChart(span=5m, function=count(), series=app)
+    end: now
+    start: 1d
+    width: 6
+    options:
+      gradient: false
+      valueFormat: abbreviated
+      interpolation: linear
+      lastBucketBehavior: include
+      xAxisTitle: ''
+      legendLabelOverflow: truncate
+      legend: true
+      showDataPoints: false
+      connect-points: false
+      plotType: area
+      imputation: none
+      yAxisTitle: count
+      stacking: none
+      polyOrder: 1
+      yAxisScale: linear
+      maxSeriesCount: 50
+      withLegendTitle: false
+      regression: false
+      regressionType: linear
+    visualization: time-chart
+    title: All messages
+    isLive: false
+    type: query
+  69c25367-0fb2-458c-8cc4-c8ca80878c80:
+    x: 0
+    y: 12
+    height: 8
+    queryString: |-
+      app = {mule-app-name}
+      loglevel=ERROR
+      | regex("Message\s*:\s*(?<msg1>[^\n]*)", field=messageInfo, strict=false)
+      | regex("^.*\]\s+[\w\.]+:\s+(?<msg2>.*)", field=messageInfo, strict=false)
+      | regex("Error Description:\s*'(?<msg3>.*?)'\.", field=messageInfo, strict=false)
+      | regex("An unhandled error occurred:\s*(?<msg4>.*)", field=messageInfo, strict=false)
+      | filtered_message := coalesce(msg1, msg2, msg3, msg4, messageInfo)
+      | drop(msg1, msg2, msg3, msg4)
+      | groupBy(filtered_message)
+      | table([_count, filtered_message])
+    end: now
+    start: 1d
+    width: 12
+    options:
+      cell-overflow: wrap-text
+      configured-columns: {}
+      row-numbers-enabled: false
+    visualization: table-view
+    title: Unique filtered ERROR list
+    isLive: false
+    type: query
+  1d0a8633-2c01-4106-a042-246e6cf928c6:
+    x: 0
+    y: 5
+    height: 4
+    queryString: |-
+      file = "*{mule-app-name}.log"
+      tags.parse_regex_error = true
+      | count()
+    end: now
+    start: 1h
+    width: 3
+    options:
+      gaugeType: radialFill
+      suffix: ''
+      padding: 0
+      thresholdConfig:
+        defaultColor: '#126CC633'
+        reversePalette: false
+      value-format: abbreviated
+    visualization: gauge
+    title: vector-parsing-error-count
+    isLive: false
+    type: query
+  00875f41-ff82-4eed-b193-f7b149d26c1c:
+    x: 0
+    y: 0
+    height: 5
+    queryString: |+
+      app = {mule-app-name}
+      loglevel = ERROR
+      | timeChart(function=count(), series=loglevel, span=5m)
+
+    end: now
+    start: 1d
+    width: 6
+    options:
+      plY: {_error_threshold}
+      horizontalPlotLineLabel: trigger
+      connect-points: false
+      stacking: none
+      yAxisScale: linear
+      imputation: none
+    visualization: time-chart
+    title: {mule-app-name} - ERROR logs
+    isLive: false
+    type: query
+  e3aa9779-9f2e-488c-b1ca-0aab006ccc23:
+    x: 3
+    y: 5
+    height: 4
+    queryString: |-
+      file = "*{mule-app-name}.log"
+      tags.parse_regex_error = true
+      | timeChart(span=1m, function=count(), series=tags.parse_regex_error)
+    end: now
+    start: 1h
+    width: 6
+    options:
+      connect-points: false
+      imputation: none
+    visualization: time-chart
+    title: vector-parsing-error-timeline
+    isLive: false
+    type: query
+$schema: https://schemas.humio.com/dashboard/v0.20.0
+parameters:
+  error-threshold:
+    defaultValue: '3'
+    order: 0
+    type: text
+    width: 2
+  warn-threshold:
+    defaultValue: '15'
+    order: 1
+    type: text
+    width: 2
